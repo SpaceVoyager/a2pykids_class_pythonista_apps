@@ -40,7 +40,7 @@ def gradient_descent_line_fitter(x, y, learning_rate = 0.02, stop_criteria = 1e-
       view.scene.add_child(test_line)
       view.scene.line = test_line
       speech.say('jumped ' + str(i) + ' times', 'en-US')
-      time.sleep(1)
+      time.sleep(2)
     
     if abs(a - old_a) < stop_criteria and abs(b - old_b) < stop_criteria:
       break
@@ -56,13 +56,20 @@ class MyScene (Scene):
   def setup(self):
     self.background_color = 'midnightblue'
     self.point_size = 5
-    bg_text = LabelNode('Gradient Descent Optimization', font=('Helvetica', 60))
-    bg_text.position =self.size / 2
-    bg_text.color = (.5, .5, .5)
-    self.add_child(bg_text)
+    self.bg_text = LabelNode('Tap screen to drop points', font=('Helvetica', 60))
+    self.bg_text.position =self.size / 2
+    self.bg_text.color = (.67, .87, 1.0)
+    self.add_child(self.bg_text)
     self.line = None
 
   def touch_began(self, touch):
+    x, y = touch.location
+    if y > 660:
+      return 
+      
+    if self.bg_text:
+      self.bg_text.remove_from_parent()
+      
     x, y = touch.location
     #generate 100 points near touch location
     for i in range(100):
@@ -101,6 +108,12 @@ def button_tapped(sender):
   speech.say('I am done!')
 
 
+def switchA_action(sender):
+  switchB.value = not switchB.value
+  
+def switchB_action(sender):
+  switchA.value = not switchA.value
+  
 view = SceneView()
 view.scene = MyScene()
 button = ui.Button(title = 'Find Line of Best Fit')
@@ -111,9 +124,42 @@ button.corner_radius = 5
 button.border_width = 1
 button.border_color = (1, 1, 1)
 button.width = 300
-button.x = 350
-button.y = 720
+button.x = 630
+button.y = 40
 button.action = button_tapped
 
+switchA = ui.Switch()
+switchA.x = 530
+switchA.y = 20
+switchA.value = False
+switchA.action = switchA_action
+
+sgd_label = ui.Label()
+sgd_label.text = 'Use Stochastic Gradient Descent:'
+sgd_label.font =  ('Chalkboard SE', 30)
+sgd_label.text_color = (1, 1, 1)
+sgd_label.width = 500
+sgd_label.x = 50
+sgd_label.y = -20 
+
 view.add_subview(button)
+view.add_subview(switchA)
+view.add_subview(sgd_label)
+
+switchB = ui.Switch()
+switchB.x = 530
+switchB.y = 60
+switchB.value = True
+switchB.action = switchB_action
+
+sgd_labelB = ui.Label()
+sgd_labelB.text = 'Use Batch Gradient Descent:'
+sgd_labelB.font =  ('Chalkboard SE', 30)
+sgd_labelB.text_color = (1, 1, 1)
+sgd_labelB.width = 500
+sgd_labelB.x = 50
+sgd_labelB.y = 20 
+
+view.add_subview(switchB)
+view.add_subview(sgd_labelB)
 view.present()
